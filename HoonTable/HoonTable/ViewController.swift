@@ -20,11 +20,21 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //어떤 Data를 넣을 것인지?
         
-        let cell = UITableViewCell.init(style: .default, reuseIdentifier: "TableCellType1")
+        //let cell = UITableViewCell.init(style: .default, reuseIdentifier: "TableCellType1")
+        let cell = TableViewMain.dequeueReusableCell(withIdentifier: "Type1", for: indexPath) as! Type1
         
-        cell.textLabel?.text = "\(indexPath.row)"
+        // as? - 확실하지 않을 때, as! - 확실할 때
+        
+        cell.LabelText.text = "\(indexPath.row)"
+        
+        //cell.textLabel?.text = "\(indexPath.row)"
+        
         
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        print("\(indexPath.row)")
     }
     
 
