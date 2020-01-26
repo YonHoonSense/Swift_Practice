@@ -12,9 +12,40 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
     
     @IBOutlet weak var TableViewMain: UITableView!
     
+    var NewsData :Array<Dictionary<String, Any>>?
+    
+    //http통신 - urlsession
+    //JSON 형식 : {"key":"value"} or {["value", "value", "value"]} ...
+    
+    func getNews() {
+        let task = URLSession.shared.dataTask(with: URL(string: "https://newsapi.org/v2/top-headlines?country=kr&apiKey=14a719d834a948a79392cda8293387b5")!) { (data, response, error) in
+            
+            if let dataJson = data {
+               
+                do {
+                    let json = try JSONSerialization.jsonObject(with: dataJson, options: [])  as! Dictionary<String, Any>
+                    let articles = json["articles"] as! Array<Dictionary<String, Any>>
+                    print(articles)
+                    self.NewsData = articles
+                    
+                    DispatchQueue.main.async {
+                        self.TableViewMain.reloadData()
+                    }
+                }
+                catch {}
+            }
+        }
+        task.resume()
+    }
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         //Data의 갯수
-        return 10
+        if let news = NewsData {
+            return news.count
+        }
+        else {
+            return 0
+        }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -25,7 +56,17 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         // as? - 확실하지 않을 때, as! - 확실할 때
         
-        cell.LabelText.text = "\(indexPath.row)"
+        let idx = indexPath.row
+        
+        if let news = NewsData {
+            let row = news[idx]
+            if let r = row as? Dictionary<String, Any> {
+                
+                if let title = r["title"]  as? String {
+                    cell.LabelText.text = title
+                }
+            }
+        }
         
         //cell.textLabel?.text = "\(indexPath.row)"
         
@@ -44,6 +85,7 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         
         TableViewMain.delegate = self
         TableViewMain.dataSource = self
+        getNews()
     }
     
     //Table View Practice
