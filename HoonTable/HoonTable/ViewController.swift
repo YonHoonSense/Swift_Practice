@@ -74,9 +74,55 @@ class ViewController: UIViewController, UITableViewDataSource, UITableViewDelega
         return cell
     }
     
+    // 1. 클릭 감지
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print("\(indexPath.row)")
+        print("Click ! \(indexPath.row)")
+        
+        let storyboard = UIStoryboard.init(name: "Main", bundle: nil)
+        let controller = storyboard.instantiateViewController(identifier: "NewsDetailController") as! NewsDetailController
+        
+       if let news = NewsData {
+           let row = news[indexPath.row]
+           if let r = row as? Dictionary<String, Any> {
+               
+               if let imageUrl = r["urlToImage"]  as? String {
+                   controller.imageUrl = imageUrl
+               }
+               if let desc = r["description"]  as? String {
+                   controller.desc = desc
+               }
+           }
+
+       }
+        
+        //showDetailViewController(controller, sender: nil)
     }
+    
+    // 2. 세그웨이
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if let id = segue.identifier, "NewsDetail" == id {
+            if let controller = segue.destination as? NewsDetailController {
+                
+                if let news = NewsData {
+                    if let indexPath = TableViewMain.indexPathForSelectedRow {
+                        let row = news[indexPath.row]
+                        if let r = row as? Dictionary<String, Any> {
+                        
+                            if let imageUrl = r["urlToImage"]  as? String {
+                                controller.imageUrl = imageUrl
+                            }
+                            if let desc = r["description"]  as? String {
+                                controller.desc = desc
+                            }
+                        }
+                    }
+
+                }
+                
+            }
+        }
+    }
+        
     
 
     override func viewDidLoad() {
